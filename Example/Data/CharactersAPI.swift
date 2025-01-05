@@ -26,8 +26,8 @@ extension CharactersAPI: EndPointType {
     
     var path: String {
         switch self {
-        case .list(let page):
-            return "/character/?page=\(page)"
+        case .list:
+            return "/character"
         }
     }
     
@@ -36,7 +36,15 @@ extension CharactersAPI: EndPointType {
     }
     
     var encoding: URLEncodingType {
-        return .url(parameters: [:], headers: [:])
+        switch self {
+        case .list(let page):
+            return .url(
+                parameters: [
+                    "page": page
+                ],
+                headers: nil
+            )
+        }
     }
 }
 

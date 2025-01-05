@@ -24,7 +24,7 @@ protocol Coordinator: ObservableObject {
 }
 
 /// Default implementation of `Coordinator`.
-class AppCoordinator: Coordinator {
+final class AppCoordinator: Coordinator {
     
     /// Router
     var router: Router

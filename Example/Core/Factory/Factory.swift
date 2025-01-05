@@ -16,13 +16,13 @@ protocol Factory {
     /// Creates `Router` object
     func createRouter() -> Router
     
-    ///
-    ///
-    func createListViewModel(coordinator: any Coordinator) async -> ListViewModel
+    /// Creates ViewModel for `ListView` screen
+    /// - Parameter coordinator: `Coordinator` object which handles routing.
+    func createListViewModel(coordinator: any Coordinator) -> ListViewModel
     
-    ///
-    ///
-    func createDetailsViewModel(character: Character) async -> DetailsViewModel
+    /// Creates `DetailsView` screen with provided `Character`.
+    /// - Parameter character: `Character` object to be displayed.
+    func createDetailsViewModel(character: Character) -> DetailsViewModel
 }
 
 class DefaultFactoryImplementation: Factory {
@@ -40,14 +40,12 @@ class DefaultFactoryImplementation: Factory {
         return coordinator
     }
     
-    @MainActor
     func createListViewModel(coordinator: any Coordinator) -> ListViewModel {
         let useCase = DefaultListViewUseCase()
         let vm = ListViewModel(useCase: useCase, coordinator: coordinator)
         return vm
     }
     
-    @MainActor
     func createDetailsViewModel(character: Character) -> DetailsViewModel {
         return DetailsViewModel(character: character)
     }

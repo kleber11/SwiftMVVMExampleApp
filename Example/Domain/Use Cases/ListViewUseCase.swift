@@ -19,11 +19,11 @@ protocol ListViewUseCase {
 struct DefaultListViewUseCase: ListViewUseCase {
     
     /// `NetworkService` property used for making API calls.
-    private let network: DefaultNetworkService<CharactersAPI>
+    private let network: any Requestable<CharactersAPI>
    
     /// Standard `init` method,
     /// - Parameter network: `NetworkService` to be injected.
-    init(network: DefaultNetworkService<CharactersAPI> = DefaultNetworkService<CharactersAPI>()) {
+    init(network: any Requestable<CharactersAPI> = DefaultNetworkService<CharactersAPI>()) {
         self.network = network
     }
     

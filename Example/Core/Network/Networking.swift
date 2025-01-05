@@ -7,8 +7,6 @@
 
 import Foundation
 
-// MARK: - Supplementary
-
 /// Requeste response containing decoded object or error.
 public typealias ResultWithError<Model> = Result<Model, Error>
 
@@ -32,13 +30,22 @@ public protocol EndPointType {
 public enum URLEncodingType {
     
     /// `URL Encoding` type.
+    /// - Parameters:
+    ///  - parameters: Dictionary containing additional params.
+    ///  - headers: Dictionary containing additional headers/
     case url(
         parameters: [String: Any],
-        headers: [String: Any]
+        headers: [String: Any]?
     )
     
     /// `JSON Encoding` type.
-    case json
+    /// - Parameters:
+    ///  - parameters: Dictionary containing additional params.
+    ///  - headers: Dictionary containing additional headers/
+    case json(
+        parameters: [String: Any],
+        headers: [String: Any]?
+    )
     
     /// Executes encoing of provided `URLRequest` with specific paramateres and headers (if any).
     func encode(
@@ -50,7 +57,7 @@ public enum URLEncodingType {
             switch self {
             case .url(let parameters, let headers):
                 try URLEncoder().encode(&request, parameters: parameters, headers: headers)
-            case .json:
+            case .json(let parameters, let headers):
                 try JSONEncoder().encode(&request, parameters: parameters, headers: headers)
             }
         } catch {
@@ -69,13 +76,15 @@ public enum HTTPMethod: String {
     case post = "POST"
 }
 
-///
-public protocol Requestable: AnyObject {
+/// Base network protocol which executes request.
+public protocol Requestable<EndPoint>: AnyObject where EndPoint: EndPointType {
 
-    ///
+    /// Type of end point.
     associatedtype EndPoint: EndPointType
     
-    ///
+    /// Executes request
+    /// - Parameter route: `EndPointType` object containing details about request.
+    /// - Throws: Decodable `Model`.
     func request<Model: Decodable>(
         _ route: EndPoint
     ) async throws -> Model
@@ -118,8 +127,8 @@ public final class DefaultNetworkService<EndPoint: EndPointType>: Requestable {
             switch route.encoding {
             case .url(let params, let headers):
                 try route.encoding.encode(&request, parameters: params, headers: headers)
-            case .json:
-                try route.encoding.encode(&request, parameters: [:], headers: [:])
+            case .json(let parameters, let headers):
+                try route.encoding.encode(&request, parameters: parameters, headers: headers)
             }
             return request
         } catch {
@@ -130,7 +139,6 @@ public final class DefaultNetworkService<EndPoint: EndPointType>: Requestable {
     private func handleResponse<Model: Decodable>(data: Data, response: URLResponse) async throws -> Model {
         guard let response = response as? HTTPURLResponse else { throw NetworkError.castError }
         guard (200..<300).contains(response.statusCode) else { throw NetworkError.invalidStatusCode(response.statusCode) }
-        print(response)
         do {
             let decodedModel = try JSONDecoder().decode(Model.self, from: data)
             return decodedModel

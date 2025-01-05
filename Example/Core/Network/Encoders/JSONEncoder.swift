@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// `JSONEncoder` which encodes provided parameters and headers into JSON representable object.
 struct JSONEncoder: ParameterEncoding {
     
     // MARK: - Conformance: ParameterEncoding

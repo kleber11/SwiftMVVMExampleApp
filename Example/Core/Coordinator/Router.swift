@@ -9,12 +9,35 @@ import Foundation
 import SwiftUI
 
 /// Enumeration with available paths to go.
-enum AppRoute {
+enum AppRoute: Hashable {
     
     /// Home page
     case home
     /// Details page
-    case details
+    case details(Character)
+    
+    // Required for Hashable conformance when associated values are present
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .home:
+            hasher.combine(0)
+        case .details(let character):
+            hasher.combine(1)
+            hasher.combine(character.id) // Assuming Character has an id property
+        }
+    }
+    
+    // Required for Equatable conformance
+    static func == (lhs: AppRoute, rhs: AppRoute) -> Bool {
+        switch (lhs, rhs) {
+        case (.home, .home):
+            return true
+        case (.details(let lhsCharacter), .details(let rhsCharacter)):
+            return lhsCharacter.id == rhsCharacter.id // Assuming Character has an id property
+        default:
+            return false
+        }
+    }
 }
 
 /// Protocol definition of `Router` pattern.

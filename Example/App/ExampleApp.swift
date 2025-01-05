@@ -10,11 +10,30 @@ import SwiftUI
 @main
 struct ExampleApp: App {
     
-    let factory = DefaultFactoryImplementation()
+    ///
+    let factory: any Factory
+    
+    ///
+    let coordinator: any Coordinator
+    
+    ///
+    init(
+        factory: (any Factory) = DefaultFactoryImplementation(),
+        coordinator: (any Coordinator)?
+    ) {
+        self.factory = factory
+        self.coordinator = coordinator ?? factory.createCoordinator()
+    }
+    
+    ///
+    init() {
+        factory = DefaultFactoryImplementation()
+        coordinator = factory.createCoordinator()
+    }
     
     var body: some Scene {
         WindowGroup {
-            ListView(viewModel: factory.createListViewModel(coordinator: factory.createCoordinator()), coordinator: factory.createCoordinator() as! AppCoordinator)
+            ListView(viewModel: ListViewModel(coordinator: coordinator))
         }
     }
 }
